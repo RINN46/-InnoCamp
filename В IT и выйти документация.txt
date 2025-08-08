@@ -1,0 +1,253 @@
+-Персонализированный подбор по вкусам/предпочтениям/характеру пользователей подарков в свой виш-лист или друзьям
+    - Цены
+        -текст о том, что делает подписка
+        - купить подписку
+            -id пользователя
+    - Контакты
+        - текст с нашими контактами
+    - О нас
+        -текст чо мы делаем, кто мы такие
+    - Пользователь
+        - ID
+        - Никнейм
+        - Пароль
+        - Почта
+        - банковские реквизиты(если пользователь оплачивает подписку)
+    - Oпрос
+        - Вопросы
+            - id вопроса
+                - 1. "Какого возраста человек, для которого нужен подпрок?
+                - 2. "Какого человек пола?"
+                - 3. "Чем увлекается человек, для которого нужен подарок?"
+                - 4. "Этот человек любит носить всякие аксессуары на себе?"
+                - 5. "Вы наносите макияж?"
+        - Варианты ответов, где пользователь должен выбрать хотя бы один
+            - Вопрос 1
+                - 14-18 лет
+                -19-24 лет
+                - 25-30 лет
+                - другое
+            - Вопрос 2
+                - Мужской
+                - Женский
+                - Другое
+            - Вопрос 3
+                - Написание музыки/ игра на музыкальных инструментах
+                - Рисование
+                - Игры
+                - Программирование
+                - Спорт
+                - Вязание
+                - Кулинария
+                - Танцы
+                - Другое
+                - Ничем из вышеперечисленного
+            
+            - Вопрос 3
+                - Да
+                - Нет
+            - Вопрос 4
+                - Да
+                - Нет
+        - Предыдущий вопрос        
+    - ИИ, который из ответов пользователя предлагает товары на основе их
+    - Предметы
+        - id предмета
+        - Фото предмета
+        - Описание предмета, где его можно купить
+        - Лайк
+    - Избранное (предметы, на которые пользователь поставил лайк)
+        - id предмета
+        - Фото предмета
+        - Описание предмета, где его можно купить
+        - Дизлайк
+    - Поддержка
+        - 
+
+1. Регистрация
+    * Endpoint: POST/users/register
+
+    
+    Request:
+    json
+    {
+    "username": "string",
+    "email": "string",
+    "password": "string"
+    }
+
+    Response:
+    json
+    {
+    "success": "bool",
+    "user_id": "int",
+    "message": "string"
+    }
+
+2. Вход в аккаунт
+    Endpoint: POST /users/login
+
+    Request:
+    json
+    {
+    "login": "string", // email или username
+    "password": "string"
+    }
+
+    Response:
+    json
+    {
+    "success": "bool",
+    "user_id": "int",
+    "token": "string"
+    }
+
+3. Опрос
+    Endpoint: POST /users/survey
+
+    Request:
+    json
+    {
+    "user_id": "int",
+    "answers": [
+        {
+        "question_id": "int",
+        "answer": "string"
+        }
+    ]
+    }
+
+    Response:
+    json
+    {
+    "success": "bool",
+    "survey_completed": "bool"
+    }\
+
+4. Анализ от ИИ, который не показывается
+    
+    Запрашиваемые данные:
+    - массив записей, которые содержат айди вопросов
+
+    Return:
+    - Массив данных о товарах
+
+
+5. Лента товаров 
+    Endpoint: POST/users/items
+
+    Запрашиваемые данные:
+    - Массив данных о товарах от ИИ
+
+    Rеturn:
+    - Фото товара
+    - Описание товара
+    - id товара
+    -пользователь лайкнул  True/False
+6. Избранное
+
+    Endpoint: POST /users/favorites
+
+    Request:
+    json
+    {
+    "user_id": "int",
+    "item_id": "int",
+    "action": "string" // "like" или "unlike"
+    }
+
+    Response:
+    json
+    {
+    "success": "bool"
+    }
+
+7.Цены
+    Endpoint:GET/user/prises
+
+    Запрашиваемые данные:
+    - id пользователя
+    - есть ли подписка True/False
+
+    Return:
+    если подписки нет:
+    -текст описанием подписки
+    -предложить купить подписку
+    если она есть:
+    -предложить продлить подписку
+8. профиль пользователя:
+    Endpoint: GET/user/profile
+
+    Request Headers:
+    Authorization: Bearer <token>
+
+    Response:
+    json
+    {
+    "username": "string",
+    "avatar": "string|null",
+    "favorites_count": "int",
+    "subscription_active": "bool"
+    }
+
+11. Реквизиты пользователя
+    Endpoint: POST /user/payment
+    Request:
+    json
+    {
+    "user_id": "int",
+    "card_number": "string",
+    "expiry_date": "string",
+    "cvv": "string"
+    }
+
+    Response:
+    json
+    {
+    "success": "bool",
+    "message": "string"
+    }
+
+
+
+
+Модели данных
+
+1. user
+json
+{
+  "id": "int",
+  "username": "string",
+  "email": "string",
+  "password": "string",
+  "avatar": "string|null",
+  "subscription": "bool",
+  "payment_details": {
+    "card_number": "string|null",
+    "expiry_date": "string|null"
+  }
+}
+
+2.вопрос
+json
+{
+  "id": "int",
+  "text": "string"
+}
+
+3. ответ
+json
+{
+  "question_id": "int",
+  "answer": "string"
+}
+
+4. предмет
+json
+{
+  "id": "int",
+  "image_url": "string",
+  "description": "string",
+  "purchase_link": "string",
+  "is_liked": "bool"
+}
