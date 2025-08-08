@@ -1,0 +1,366 @@
+-Персонализированный подбор по вкусам/предпочтениям/характеру пользователей подарков в свой виш-лист или друзьям
+    - Услуги
+        - купить подписку
+            -id пользователя
+    - Контакты
+    - О нас
+    - Пользователь
+        - ID
+        - Никнейм
+        - Пароль
+        - Почта
+        - банковские реквизиты(если пользователь оплачивает подписку)
+    - Oпрос
+        - Вопросы
+            - id вопроса
+                - 1. "Какого возраста человек, для которого нужен подпрок?
+                - 2. "Какого человек пола?"
+                - 3. "Чем увлекается человек, для которого нужен подарок?"
+                - 4. "Этот человек любит носить всякие аксессуары на себе?"
+                - 5. "Вы наносите макияж?"
+        - Варианты ответов, где пользователь должен выбрать хотя бы один
+            - Вопрос 1
+                - 14-18 лет
+                -19-24 лет
+                - 25-30 лет
+                - другое
+            - Вопрос 2
+                - Мужской
+                - Женский
+                - Другое
+            - Вопрос 3
+                - Написание музыки/ игра на музыкальных инструментах
+                - Рисование
+                - Игры
+                - Программирование
+                - Спорт
+                - Вязание
+                - Кулинария
+                - Танцы
+                - Другое
+                - Ничем из вышеперечисленного
+            
+            - Вопрос 3
+                - Да
+                - Нет
+            - Вопрос 4
+                - Да
+                - Нет
+        - Предыдущий вопрос        
+    - ИИ, который из ответов пользователя предлагает товары на основе их
+    - Предметы
+        - id предмета
+        - Фото предмета
+        - Описание предмета, где его можно купить
+        - Лайк
+    - Избранное (предметы, на которые пользователь поставил лайк)
+        - id предмета
+        - Фото предмета
+        - Описание предмета, где его можно купить
+        - Дизлайк
+    - Вишлист другого пользователя
+        -id другого пользователя
+        - лайки
+    - Поддержка
+    - Новое
+
+
+
+1. Регистрация
+    * Endpoint: POST/users/register
+
+    
+    Request:
+    json
+    {
+    "username": "string",
+    "email": "string",
+    "password": "string"
+    }
+
+    Response:
+    json
+    {
+    "success": "bool",
+    "user_id": "int",
+    "message": "string"
+    }
+
+2. Вход в аккаунт
+    Endpoint: POST /users/login
+
+    Request:
+    json
+    {
+    "login": "string", // email или username
+    "password": "string"
+    }
+
+    Response:
+    json
+    {
+    "success": "bool",
+    "user_id": "int",
+    "token": "string"
+    }
+
+3. Опрос
+    Endpoint: POST /users/survey
+
+    Request:
+    json
+    {
+    "user_id": 123,
+    "answers": [
+        {
+        "question_id": 1,
+        "answer": "25-30 лет"
+        },
+        {
+        "question_id": 2,
+        "answer": "Женский"
+        }
+    ]
+    }
+    Response:
+    json
+    {
+    "success": true,
+    "survey_completed": true
+    }
+
+4. Получение рекомендаций от ИИ
+    Endpoint: POST /users/ai-analysis
+
+    Request:
+    json
+    {
+    "user_id": 123
+    }
+    Response:
+    json
+    {
+    "success": true,
+    "recommendations": [
+        {
+        "id": 1,
+        "image_url": "https://example.com/item1.jpg",
+        "description": "Беспроводные наушники",
+        "purchase_link": "https://example.com/buy/1",
+        "is_liked": false
+        }
+    ]
+    }
+
+5. Лента товаров 
+    Endpoint: POST/users/items
+
+    Запрашиваемые данные:
+    - Массив данных о товарах от ИИ
+
+    Rеturn:
+    - Фото товара
+    - Описание товара
+    - id товара
+    -пользователь лайкнул  True/False
+6. Избранное
+
+    Endpoint: POST /users/favorites
+
+    Request:
+    json
+    {
+    "user_id": "int",
+    "item_id": "int",
+    "action": "string" // "like" или "unlike"
+    }
+    Response:
+    json
+    {
+    "success": "bool"
+    }
+
+7.Цены (зависит от того, есть лли у пользователя подписка)
+    Endpoint: GET /user/prices
+    Response (без подписки):
+    json
+    {
+    "has_subscription": false,
+    "description": "Subscribe to get personalized gift recommendations...",
+    "price": "9.99/month",
+    "features": ["Feature 1", "Feature 2"]
+    }
+
+    Response (с подпиской):
+    json
+    {
+    "has_subscription": true,
+    "message": "Your subscription is active until 2024-12-31",
+    "price": "9.99/month"
+    }
+8. профиль пользователя:
+    Endpoint: GET /user/profile
+    Response:
+    json
+    {
+    "username": "string",
+    "avatar": "https://example.com/avatar.jpg",
+    "favorites_count": 5,
+    "subscription_active": true
+    }
+
+11. Сохранение платежных данных
+    Endpoint: POST /user/payment
+    Request:
+    json
+    {
+    "user_id": 123,
+    "card_number": "4111111111111111",
+    "expiry_date": "12/25",
+    "cvv": "123"
+    }
+
+12. Просмотр вишлиста другого пользователя
+    Endpoint: GET /users/{user_id}/wishlist
+
+    Response:
+    json
+    {
+    "username": "friend_username",
+    "items": [
+        {
+        "id": 1,
+        "image_url": "https://example.com/item1.jpg",
+        "description": "Беспроводные наушники",
+        "purchase_link": "https://example.com/buy/1",
+        "is_liked": true
+        }
+    ]
+    }
+
+7. Покупка товара из виш-листа
+    Endpoint: POST /users/purchase
+
+    Request:
+    json
+    {
+    "buyer_id": 123,
+    "item_id": 1,
+    "recipient_id": 456,
+    "card_number": "4111111111111111",
+    "expiry_date": "12/25",
+    "cvv": "123"
+    }
+
+    Response:
+    json
+    {
+    "success": true,
+    "message": "Purchase completed successfully",
+    "order_id": "ORD-123456"
+    }
+8. Новое
+Endpoint: GET /new
+Описание: Последние обновления и новинки
+Response:
+
+json
+{
+  "updates": [
+    {
+      "date": "2023-12-01",
+      "title": "Новая система рекомендаций",
+      "description": "Улучшенный алгоритм подбора подарков"
+    },
+    {
+      "date": "2023-11-15",
+      "title": "Общие виш-листы",
+      "description": "Теперь можно создавать совместные списки подарков"
+    }
+  ],
+  "new_features": [
+    "Подарочные сертификаты",
+    "Напоминания о событиях"
+  ]
+}
+9. Поддержка
+Endpoint: GET /support
+Описание: Техническая поддержка и помощь
+Response:
+
+json
+{
+  "contact": {
+    "email": "support@giftfinder.com",
+    "phone": "+1 (800) 123-4567",
+    "online_chat": true
+  },
+  "faq": [
+    {
+      "question": "Как восстановить пароль?",
+      "answer": "Используйте форму восстановления на странице входа"
+    },
+    {
+      "question": "Как отменить подписку?",
+      "answer": "В разделе 'Моя подписка' в профиле"
+    }
+  ],
+  "status": {
+    "api": "operational",
+    "database": "operational",
+    "last_incident": "2023-11-10"
+  }
+}
+
+Модели данных
+
+1. user
+json
+{
+  "id": 123,
+  "username": "string",
+  "email": "string@example.com",
+  "avatar": "string|null",
+  "subscription": true,
+  "payment_details": {
+    "card_number": "**** **** **** 1111",
+    "expiry_date": "12/25"
+  }
+}
+
+2.вопрос
+json
+{
+  "id": 1,
+  "text": "Какого возраста человек?",
+  "options": ["14-18 лет", "19-24 лет"]
+}
+
+3. ответ
+json
+{
+  "question_id": 1,
+  "answer": "19-24 лет"
+}
+
+4. товар
+json
+{
+  "id": 1,
+  "image_url": "https://example.com/item1.jpg",
+  "description": "Беспроводные наушники",
+  "purchase_link": "https://example.com/buy/1",
+  "is_liked": true
+}
+
+5. Заказ
+json
+{
+  "order_id": "ORD-123456",
+  "buyer_id": 123,
+  "recipient_id": 456,
+  "item_id": 1,
+  "purchase_date": "2023-12-01",
+  "status": "completed"
+}
+
